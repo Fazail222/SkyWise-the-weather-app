@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
-import gsap from 'gsap';
 import { askSkyWiseAI } from '../../redux/ai/aiThunk';
 import { clearChatHistory } from '../../redux/ai/aiSlice';
 import {
@@ -32,9 +31,6 @@ export default function FloatingAIChat() {
   const launcherRef = useRef(null);
   const messagesContainerRef = useRef(null);
   const promptsRef = useRef(null);
-  const dotsRef = useRef([]);
-  const dotsTweenRef = useRef(null);
-  const prevMessageCountRef = useRef(0);
 
   // Redux State Selectors
   const { messages, loading, error } = useSelector((state) => state.ai);
@@ -58,25 +54,6 @@ export default function FloatingAIChat() {
       chatEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
   }, [messages, loading, isOpen]);
-
-  // GSAP: typing indicator dots (loop while loading)
-  useEffect(() => {
-    if (!loading || !dotsRef.current.length || prefersReducedMotion()) return;
-
-    dotsTweenRef.current = gsap.to(dotsRef.current, {
-      y: -6,
-      duration: 0.4,
-      ease: 'power1.inOut',
-      repeat: -1,
-      yoyo: true,
-      stagger: { each: 0.15, repeat: -1, yoyo: true },
-    });
-
-    return () => {
-      dotsTweenRef.current?.kill();
-      gsap.set(dotsRef.current, { y: 0 });
-    };
-  }, [loading]);
 
   // Lock background scroll on mobile while the panel is open full-screen
   useEffect(() => {
@@ -317,10 +294,25 @@ export default function FloatingAIChat() {
                     <div className="bg-skywise-bg border border-skywise-border p-3 rounded-2xl rounded-tl-none flex items-center gap-2 text-xs text-skywise-textMuted">
                       <span className="flex gap-1">
                         {[0, 1, 2].map((i) => (
-                          <span
+                          <motion.span
                             key={i}
-                            ref={(el) => (dotsRef.current[i] = el)}
-                            className="w-1.5 h-1.5 rounded-full bg-skywise-accentGlow"
+                            animate={
+                              prefersReducedMotion()
+                                ? {}
+                                : { y: [-6, 0] }
+                            }
+                            transition={
+                              prefersReducedMotion()
+                                ? {}
+                                : {
+                                    duration: 0.4,
+                                    repeat: Infinity,
+                                    repeatType: 'reverse',
+                                    ease: 'easeInOut',
+                                    delay: i * 0.15,
+                                  }
+                            }
+                            className="w-1.5 h-1.5 rounded-full bg-skywise-accentGlow inline-block"
                           />
                         ))}
                       </span>
