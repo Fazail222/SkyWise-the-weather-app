@@ -1,0 +1,92 @@
+@import "tailwindcss";
+
+:root {
+
+  --bg: #F6F8FC;
+  --card: #FFFFFF;
+  --card-hover: #F1F5F9;
+  --border: #CBD5E1;
+
+  --accent: #2563EB;
+  --accent-glow: #3B82F6;
+  --ai-glow: #6366F1;
+
+  --text-primary: #0F172A;
+  --text-muted: #64748B;
+
+}
+
+.dark {
+
+  --bg: #060B13;
+  --card: #0C1322;
+  --card-hover: #111A2E;
+  --border: #1A253B;
+
+  --accent: #2563EB;
+  --accent-glow: #3B82F6;
+  --ai-glow: #6366F1;
+
+  --text-primary: #FFFFFF;
+  --text-muted: #94A3B8;
+
+}
+
+@theme {
+
+  --color-skywise-bg: var(--bg);
+  --color-skywise-card: var(--card);
+  --color-skywise-cardHover: var(--card-hover);
+  --color-skywise-border: var(--border);
+
+  --color-skywise-accent: var(--accent);
+  --color-skywise-accentGlow: var(--accent-glow);
+  --color-skywise-aiGlow: var(--ai-glow);
+
+  --color-skywise-textPrimary: var(--text-primary);
+  --color-skywise-textMuted: var(--text-muted);
+
+}
+@keyframes ticker-left {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes ticker-right {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0%); }
+}
+
+.animate-ticker-left {
+  animation: ticker-left 25s linear infinite;
+}
+
+.animate-ticker-right {
+  animation: ticker-right 25s linear infinite;
+}
+
+/* Global Scrollbar Customization */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.2); /* Muted border/thumb color */
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.4); /* Slightly brighter on hover */
+}
+
+/* Firefox Support */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+}
