@@ -9,7 +9,12 @@ export const selectLocationFromMap = createAsyncThunk(
     }
 
     try {
-      const response = await axios.get(`/api/v1/weather/coords?lat=${lat}&lon=${lon}`);
+    const response = await axios.get("/weather/coords", {
+  params: {
+    lat,
+    lon,
+  },
+});
       return {
         lat,
         lng: lon,
