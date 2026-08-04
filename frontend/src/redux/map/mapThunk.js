@@ -11,9 +11,10 @@ export const selectLocationFromMap = createAsyncThunk(
         isNaN(lat) ||
         isNaN(lon)
       ) {
-        return rejectWithValue("Invalid coordinates");
+        return rejectWithValue("Invalid coordinates provided");
       }
 
+      // Uses the mapApi service
       const response = await mapApi.getWeatherByCoords(lat, lon);
 
       const weather = response.data;
@@ -27,26 +28,32 @@ export const selectLocationFromMap = createAsyncThunk(
 
         temp: weather.current.temp,
         feelsLike: weather.current.feelsLike,
+        tempMin: weather.current.tempMin,
+        tempMax: weather.current.tempMax,
+
         humidity: weather.current.humidity,
         pressure: weather.current.pressure,
+        visibility: weather.current.visibility,
+
         windSpeed: weather.current.windSpeed,
         windDeg: weather.current.windDeg,
 
-        description: weather.current.description,
         condition: weather.current.condition,
+        description: weather.current.description,
         icon: weather.current.icon,
 
-        visibility: weather.current.visibility,
+        sunrise: weather.current.sunrise,
+        sunset: weather.current.sunset,
 
+        airQuality: weather.airQuality,
         hourlyForecast: weather.hourlyForecast,
         dailyForecast: weather.dailyForecast,
-        airQuality: weather.airQuality,
       };
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message ||
-          error.message ||
-          "Failed to fetch weather"
+        error.message ||
+        "Failed to fetch location weather"
       );
     }
   }

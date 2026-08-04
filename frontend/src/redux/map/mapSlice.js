@@ -52,25 +52,12 @@ setPendingMarker: (state, action) => {
         state.loading = true;
         state.error = null;
       })
-   .addCase(selectLocationFromMap.fulfilled, (state, action) => {
+  .addCase(selectLocationFromMap.fulfilled, (state, action) => {
   state.loading = false;
-
-  const lat = Number(action.payload.lat) || state.center.lat;
-  const lng = Number(action.payload.lng) || state.center.lng;
-
-  const locationInfo = action.payload.location || {};
-  const currentInfo = action.payload.current || {};
-
-  state.selectedMarker = {
-    lat,
-    lng,
-    city: locationInfo.city || 'Unknown Location',
-    temp: currentInfo.temp,
-    description: currentInfo.description,
-    icon: currentInfo.icon,
-    feelsLike: currentInfo.feelsLike,
-    humidity: currentInfo.humidity,
-    windSpeed: currentInfo.windSpeed,
+  state.selectedMarker = action.payload;
+  state.center = {
+    lat: action.payload.lat,
+    lng: action.payload.lng,
   };
 })
       .addCase(selectLocationFromMap.rejected, (state, action) => {
