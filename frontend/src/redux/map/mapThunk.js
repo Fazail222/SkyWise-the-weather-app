@@ -1,27 +1,32 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { mapApi } from "../../services/mapApi";
 
 export const selectLocationFromMap = createAsyncThunk(
-  'map/selectLocationFromMap',
+  "map/selectLocationFromMap",
   async ({ lat, lon }, { rejectWithValue }) => {
-    if (lat === undefined || lon === undefined || isNaN(lat) || isNaN(lon)) {
-      return rejectWithValue('Invalid coordinates provided');
-    }
-
     try {
-    const response = await axios.get("/weather/coords", {
-  params: {
-    lat,
-    lon,
-  },
-});
+      if (
+        lat === undefined ||
+        lon === undefined ||
+        isNaN(lat) ||
+        isNaN(lon)
+      ) {
+        return rejectWithValue("Invalid coordinates");
+      }
+
+      const response = await mapApi.getWeatherByCoords(lat, lon);
+
       return {
         lat,
         lng: lon,
-        ...response.data.data, // Assumes your backend returns structured weather payload
+        ...response.data,
       };
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to fetch location weather');
+      return rejectWithValue(
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to fetch weather"
+      );
     }
   }
 );
