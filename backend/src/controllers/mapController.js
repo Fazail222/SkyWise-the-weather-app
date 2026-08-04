@@ -1,35 +1,48 @@
 import axios from 'axios';
 
 /**
- * @desc    Proxy OpenWeather Radar / Weather Tiles to Google Maps
- * @route   GET /api/v1/map/tiles/:layer/:z/:x/:y
+ * @desc    Get current weather details for specific map coordinates (Lat/Lon)
+ * @route   GET /api/v1/map/weather?lat=XX&lon=YY
  * @access  Public
  */
-export const getWeatherTile = async (req, res, next) => {
+export const getLocationWeather = async (req, res, next) => {
   try {
-    const { layer, z, x, y } = req.params;
+    const { lat, lon } = req.query;
+
+    if (!lat || !lon) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Latitude and longitude coordinates are required' 
+      });
+    }
+
     const apiKey = process.env.WEATHER_API_KEY || process.env.OPENWEATHER_API_KEY;
 
     if (!apiKey) {
       return res.status(500).json({ success: false, message: 'Weather API key missing' });
     }
 
-    const tileUrl = `https://tile.openweathermap.org/map/${layer}/${z}/${x}/${y}.png?appid=${apiKey}`;
-    
-    const response = await axios.get(tileUrl, { 
-      responseType: 'arraybuffer',
-      timeout: 5000, // 5s timeout to prevent hung requests
-    });
-    
-    // Set 1-hour browser cache so repeated map pans don't re-fetch identical tiles
-    res.set({
-      'Content-Type': 'image/png',
-      'Cache-Control': 'public, max-age=3600',
-    });
+    // Using OpenWeather Current Weather Data API
+    const weatherUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`;
 
-    return res.send(Buffer.from(response.data));
+    const response = await axios.get(weatherUrl, { timeout: 5000 });
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        name: response.data.name || 'Selected Location',
+        temperature: response.data.main.temp,
+        feelsLike: response.data.main.feels_like,
+        humidity: response.data.main.humidity,
+        description: response.data.weather[0].description,
+        icon: response.data.weather[0].icon,
+        windSpeed: response.data.wind.speed,
+      }
+    });
   } catch (error) {
-    // Fail gracefully with a 404 or empty image if tile not found
-    return res.status(404).end();
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Failed to fetch weather data for this location' 
+    });
   }
 };

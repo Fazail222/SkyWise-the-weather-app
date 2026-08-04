@@ -33,6 +33,18 @@ const mapSlice = createSlice({
     clearSelectedMarker: (state) => {
       state.selectedMarker = null;
     },
+    // add this reducer alongside your existing ones
+setPendingMarker: (state, action) => {
+  const { lat, lng } = action.payload;
+  state.center = { lat, lng };
+  state.selectedMarker = {
+    lat,
+    lng,
+    city: null,     // null = "still loading" flag for the popup
+    temp: undefined,
+    description: undefined,
+  };
+},
   },
   extraReducers: (builder) => {
     builder
@@ -40,16 +52,27 @@ const mapSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(selectLocationFromMap.fulfilled, (state, action) => {
-        state.loading = false;
-        state.center = { lat: action.payload.lat, lng: action.payload.lon };
-        state.selectedMarker = {
-          lat: action.payload.lat,
-          lng: action.payload.lon,
-          city: action.payload.weatherData?.location?.city || 'Selected Location',
-          temp: action.payload.weatherData?.current?.temp,
-        };
-      })
+   .addCase(selectLocationFromMap.fulfilled, (state, action) => {
+  state.loading = false;
+
+  const lat = Number(action.payload.lat) || state.center.lat;
+  const lng = Number(action.payload.lng) || state.center.lng;
+
+  const locationInfo = action.payload.location || {};
+  const currentInfo = action.payload.current || {};
+
+  state.selectedMarker = {
+    lat,
+    lng,
+    city: locationInfo.city || 'Unknown Location',
+    temp: currentInfo.temp,
+    description: currentInfo.description,
+    icon: currentInfo.icon,
+    feelsLike: currentInfo.feelsLike,
+    humidity: currentInfo.humidity,
+    windSpeed: currentInfo.windSpeed,
+  };
+})
       .addCase(selectLocationFromMap.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
@@ -57,12 +80,14 @@ const mapSlice = createSlice({
   },
 });
 
+// update your exports line
 export const {
   setActiveLayer,
   setMapCenter,
   setMapZoom,
   setLayerOpacity,
   clearSelectedMarker,
+  setPendingMarker, // 👈 add this
 } = mapSlice.actions;
 
 export default mapSlice.reducer;

@@ -6,7 +6,8 @@ import { Toaster } from "react-hot-toast";
 import ThemeProvider from "./context/ThemeProvider";
 import App from "./App";
 import "./index.css";
-
+import 'leaflet/dist/leaflet.css';
+import "./utils/fixLeafletIcon";
 import { store } from "./redux/store";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
