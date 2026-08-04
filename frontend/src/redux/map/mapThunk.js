@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { mapApi } from "../../services/mapApi";
+import { mapApi } from "../../api/mapApi";
 
 export const selectLocationFromMap = createAsyncThunk(
   "map/selectLocationFromMap",
